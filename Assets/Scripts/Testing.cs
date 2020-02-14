@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class Testing : MonoBehaviour
 {
-    private Grid grid;
+    private Grid<bool> grid;
 
-    private void Start()
+    void Start()
     {
-        grid = new Grid(4, 2, 10f);
+        grid = new Grid<bool>(20, 10, 8f, new Vector3(-80f, -40f, 0f), (Grid<bool> g, int x, int y) => new bool());
     }
-
-    private void Update()
+    
+    void Update()
     {
         if(Input.GetMouseButtonDown(0))
-            grid.SetValue(Utils.GetMouseWorldPosition(), 56);
-
-        if (Input.GetMouseButtonDown(1))
-            grid.GetValue(Utils.GetMouseWorldPosition());
+        {
+            Vector3 position = Utils.GetMouseWorldPosition();
+            grid.SetGridValue(position, true);
+        }
     }
 }
