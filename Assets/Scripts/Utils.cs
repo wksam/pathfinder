@@ -28,4 +28,47 @@ public class Utils
     }
 
     public static Vector3 GetMouseWorldPositionWithZ(Vector3 screenPosition, Camera worldCamera) => worldCamera.ScreenToWorldPoint(screenPosition);
+
+    public static void CreateEmptyMeshArrays(int quadCount, out Vector3[] vertices, out Vector2[] uvs, out int[] triangles)
+    {
+        vertices = new Vector3[4 * quadCount];
+        uvs = new Vector2[4 * quadCount];
+        triangles = new int[6 * quadCount];
+    }
+
+    public static void AddMeshArrays(Vector3[] vertices, Vector2[] uvs, int[] triangles, int index, Vector3 position, float rotation, Vector3 baseSize, Vector2 uv00, Vector2 uv11)
+    {
+        // Relocate vertices
+        int vIndex = index * 4;
+        int vInde0 = vIndex;
+        int vInde1 = vIndex + 1;
+        int vInde2 = vIndex + 2;
+        int vInde3 = vIndex + 3;
+
+        baseSize *= .5f;
+
+        bool skewed = baseSize.x != baseSize.y;
+        if(skewed)
+        {
+            vertices[vInde0] = position + GetQuaternionEuler(rotation) * new Vector3(-baseSize.x, baseSize.y);
+            vertices[vInde1] = position + GetQuaternionEuler(rotation) * new Vector3(-baseSize.x, -baseSize.y);
+            vertices[vInde2] = position + GetQuaternionEuler(rotation) * new Vector3(baseSize.x, -baseSize.y);
+            vertices[vInde3] = position + GetQuaternionEuler(rotation) * baseSize;
+        }
+        else
+        {
+            vertices[vInde0] = position + GetQuaternionEuler(rotation - 270) * baseSize;
+            vertices[vInde1] = position + GetQuaternionEuler(rotation - 180) * baseSize;
+            vertices[vInde2] = position + GetQuaternionEuler(rotation - 90) * baseSize;
+            vertices[vInde3] = position + GetQuaternionEuler(rotation) * baseSize;
+        }
+
+        // Relocate UVs
+        uvs[vInde0] = new Vector2(uv00.x, uv11.y);
+        uvs[vInde1] = new Vector2(uv00.x, uv00.y);
+        uvs[vInde2] = new Vector2(uv11.x, uv00.y);
+        uvs[vInde3] = new Vector2(uv11.x, uv11.y);
+    }
+
+    private static Quaternion GetQuaternionEuler(float rotation) => Quaternion.Euler(new Vector3(0, rotation, 0));
 }
